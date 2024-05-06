@@ -1,1 +1,3 @@
 # stereosat
+
+Work in progress repository for processing Pleiades stereo pairs/multi-views with differente pipelines...
