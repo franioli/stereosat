@@ -55,18 +55,6 @@ def create_sysproj_xml(epsg: int | str, fname: str = "SysPROJ.xml") -> Path:
     proj = crs.to_proj4()
 
     with open(fname, "w") as f:
-        # f.write("<SystemeCoord>\n")
-        # f.write("         <BSC>\n")
-        # f.write("            <TypeCoord>  eTC_Proj4 </TypeCoord>\n")
-        # f.write("            <AuxR>       1        </AuxR>\n")
-        # f.write("            <AuxR>       1        </AuxR>\n")
-        # f.write("            <AuxR>       1        </AuxR>\n")
-        # f.write(f"            <AuxStr>  {proj}   </AuxStr>\n")  # Insert PROJ.4 string
-        # f.write(
-        #     "                                                                                                            \n"
-        # )
-        # f.write("         </BSC>\n")
-        # f.write("</SystemeCoord>\n")
         f.write('<?xml version="1.0" ?>\n')
         f.write("<SystemeCoord>\n")
         f.write("     <BSC>\n")
@@ -81,8 +69,8 @@ def create_sysproj_xml(epsg: int | str, fname: str = "SysPROJ.xml") -> Path:
 
 
 def find_tiepoints(
-    pref_im: str,
     ext_im: str,
+    pref_im: str = None,
     method: str = "All",
     resize: int = -1,
     export_text: bool = False,
@@ -98,6 +86,8 @@ def find_tiepoints(
         raise ValueError(
             "Invalid method. Must be one of: MulScale, All, Line, File, Graph"
         )
+    if pref_im is None:
+        pref_im = ""
 
     cmd = f'mm3d Tapioca {method} "{pref_im}(.*).{ext_im}" {resize} ExpTxt={int(export_text)}'
     if verbose:
@@ -162,6 +152,20 @@ def bundle_adjustment(
     logger.info(f"Bundle adjustment completed. Output directory: {maltOri_dir}")
 
     return maltOri_dir
+
+
+def match_dense_object():
+    'mm3d Malt Ortho "(.*).tif" Ori-RPC-d3-adj EXA=1 ZoomI=4 ZoomF=2 VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 DoOrtho=1 NbVI=2'
+
+    "mm3d Tawny Ortho-MEC-Malt  RadiomEgal=0"
+
+
+def match_dense_image():
+    'mm3d Malt GeomImage ".*tif" Ori-RPC-d3-adj Master=IMG_PHR1B_PMS_201611031018130_SEN_5225523101_R1C1.tif SzW=1 Regul=0.1 NbVI=2 ZPas=1 ZoomI=16 ZoomF=8'
+    'mm3d Malt UrbanMNE ".*tif" Ori-RPC-d3-adj DoMEC=0'
+    "mm3d NuageBascule MM-Malt-Img-IMG_PHR1B_PMS_201611031018130_SEN_5225523101_R1C1/NuageImProf_STD-MALT_Etape_4.xml MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Fusion/DSM_stereo.xml"
+    "mm3d SMDM Fusion/DSM_stereo.*xml"
+    "mm3d Nuage2Ply Fusion/Fusion.xml Out=Fusion.ply"
 
 
 def correlation_into_dem(
@@ -251,8 +255,3 @@ if __name__ == "__main__":
     # Correlation into DEM
 
     print("Done.")
-
-
-# mm3d Malt Ortho "(.*).tif" Ori-RPC-d3-adj EXA=1 ZoomI=4 ZoomF=2 VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 DoOrtho=1 NbVI=2
-
-# mm3d Tawny Ortho-MEC-Malt  RadiomEgal=0
